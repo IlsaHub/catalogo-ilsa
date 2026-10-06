@@ -1,94 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Test ILSA</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<h1>TEST ILSA</h1>
+
+<div id="risultato">caricamento...</div>
+
 <script>
 
-const supabaseUrl = 'https://ypfdfgozryeelcohdntg.supabase.co';
+console.log("SUPABASE:", typeof supabase);
 
-const supabaseKey = 'sb_publishable_ROJsYJW_HNCE7HfQNf8baw_UuVfBUSg';
-
-const { createClient } = supabase;
-
-const client = createClient(
-    supabaseUrl,
-    supabaseKey
-);
-
-async function caricaArticoli() {
-
-    const { data, error } =
-    await client
-        .from('articoli')
-        .select('*')
-        .limit(20);
-
-    if (error) {
-
-        document.getElementById("lista").innerHTML =
-        "<pre>" + JSON.stringify(error,null,2) + "</pre>";
-
-        console.error(error);
-
-        return;
-    }
-
-    let html = "";
-
-    data.forEach(item => {
-
-        const foto =
-        `https://ypfdfgozryeelcohdntg.supabase.co/storage/v1/object/public/prodotti/${item.nome_immagine}`;
-
-        html += `
-        <div class="card">
-
-            <div class="codice">
-                ${item.codice_articolo}
-            </div>
-
-            <p>
-                <strong>Descrizione IT</strong><br>
-                ${item.descrizione_it || ''}
-            </p>
-
-            <p>
-                <strong>Descrizione EN</strong><br>
-                ${item.descrizione_en || ''}
-            </p>
-
-            <p>
-                <strong>EAN:</strong>
-                ${item.ean || ''}
-            </p>
-
-            <p class="prezzo">
-                € ${item.prezzo || ''}
-            </p>
-
-            ${
-                item.novita === "NEW"
-                ? '<span class="badge">NOVITÀ</span>'
-                : ''
-            }
-
-            <br><br>
-
-            <img
-                class="prodotto-img"
-                src="${foto}"
-                alt="${item.codice_articolo}"
-                onerror="this.style.display='none';"
-            >
-
-        </div>
-        `;
-    });
-
-    document.getElementById("lista").innerHTML =
-    html;
-
-}
-
-document.addEventListener(
-    "DOMContentLoaded",
-    caricaArticoli
-);
+document.getElementById("risultato").innerHTML =
+"SUPABASE = " + typeof supabase;
 
 </script>
+
+</body>
+</html>
