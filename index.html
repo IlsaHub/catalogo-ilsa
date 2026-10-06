@@ -1,23 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Test ILSA</title>
+<meta charset="utf-8">
+<title>Catalogo ILSA</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{
+font-family:Arial;
+padding:20px;
+}
+
+.card{
+border:1px solid #ddd;
+padding:10px;
+margin-bottom:10px;
+}
+</style>
+
 </head>
+
 <body>
 
-<h1>TEST ILSA</h1>
+<h1>Catalogo ILSA</h1>
 
-<div id="risultato">caricamento...</div>
+<div id="lista">
+Caricamento...
+</div>
 
 <script>
 
-console.log("SUPABASE:", typeof supabase);
+const client = supabase.createClient(
+'https://ypfdfgozryeelcohdntg.supabase.co',
+'sb_publishable_ROJsYJW_HNCE7HfQNf8baw_UuVfBUSg'
+);
 
-document.getElementById("risultato").innerHTML =
-"SUPABASE = " + typeof supabase;
+async function test(){
+
+const { data,error } =
+await client
+.from('articoli')
+.select('codice_articolo,descrizione_it,prezzo')
+.limit(5);
+
+if(error){
+
+document.getElementById('lista').innerHTML =
+JSON.stringify(error);
+
+return;
+}
+
+let html='';
+
+data.forEach(r=>{
+
+html += `
+<div class="card">
+
+<b>${r.codice_articolo}</b>
+<br>
+
+${r.descrizione_it}
+<br>
+
+€ ${r.prezzo}
+
+</div>
+`;
+
+});
+
+document.getElementById('lista').innerHTML =
+html;
+
+}
+
+test();
 
 </script>
 
