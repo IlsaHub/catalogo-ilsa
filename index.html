@@ -1,83 +1,94 @@
 <script>
 
-const supabaseUrl =
-'https://ypfdfgozryeelcohdntg.supabase.co';
+const supabaseUrl = 'https://ypfdfgozryeelcohdntg.supabase.co';
 
-const supabaseKey =
-'sb_publishable_ROJsYJW_HNCE7HfQNf8baw_UuVfBUSg';
+const supabaseKey = 'sb_publishable_ROJsYJW_HNCE7HfQNf8baw_UuVfBUSg';
 
 const { createClient } = supabase;
 
-const client =
-createClient(
-supabaseUrl,
-supabaseKey
+const client = createClient(
+    supabaseUrl,
+    supabaseKey
 );
 
 async function caricaArticoli() {
 
-const { data, error } =
-await client
-.from('articoli')
-.select('*')
-.limit(10);
+    const { data, error } =
+    await client
+        .from('articoli')
+        .select('*')
+        .limit(20);
 
-if (error) {
+    if (error) {
 
-document.getElementById("lista").innerHTML =
-"<h2>Errore</h2><pre>" +
-JSON.stringify(error,null,2) +
-"</pre>";
+        document.getElementById("lista").innerHTML =
+        "<pre>" + JSON.stringify(error,null,2) + "</pre>";
 
-return;
-}
+        console.error(error);
 
-let html = "";
+        return;
+    }
 
-for (const item of data) {
+    let html = "";
 
-html += `
-<div class="card">
+    data.forEach(item => {
 
-<h2>${item.codice_articolo}</h2>
+        const foto =
+        `https://ypfdfgozryeelcohdntg.supabase.co/storage/v1/object/public/prodotti/${item.nome_immagine}`;
 
-<p>
-<b>IT:</b>
-${item.descrizione_it}
-</p>
+        html += `
+        <div class="card">
 
-<p>
-<b>EN:</b>
-${item.descrizione_en}
-</p>
+            <div class="codice">
+                ${item.codice_articolo}
+            </div>
 
-<p>
-<b>EAN:</b>
-${item.ean}
-</p>
+            <p>
+                <strong>Descrizione IT</strong><br>
+                ${item.descrizione_it || ''}
+            </p>
 
-<p>
-<b>Prezzo:</b>
-€ ${item.prezzo}
-</p>
+            <p>
+                <strong>Descrizione EN</strong><br>
+                ${item.descrizione_en || ''}
+            </p>
 
-<p>
-<b>Novità:</b>
-${item.novita}
-</p>
+            <p>
+                <strong>EAN:</strong>
+                ${item.ean || ''}
+            </p>
 
-</div>
-`;
-}
+            <p class="prezzo">
+                € ${item.prezzo || ''}
+            </p>
 
-document.getElementById("lista").innerHTML =
-html;
+            ${
+                item.novita === "NEW"
+                ? '<span class="badge">NOVITÀ</span>'
+                : ''
+            }
+
+            <br><br>
+
+            <img
+                class="prodotto-img"
+                src="${foto}"
+                alt="${item.codice_articolo}"
+                onerror="this.style.display='none';"
+            >
+
+        </div>
+        `;
+    });
+
+    document.getElementById("lista").innerHTML =
+    html;
 
 }
 
 document.addEventListener(
-"DOMContentLoaded",
-caricaArticoli
+    "DOMContentLoaded",
+    caricaArticoli
 );
 
 </script>
