@@ -1,1 +1,52 @@
+# Disabilita listing cartelle
+Options -Indexes
 
+# Nasconde alcuni file sensibili
+<FilesMatch "^(\.htaccess|\.htpasswd|README\.md)$">
+    Require all denied
+</FilesMatch>
+
+# Blocca user-agent noti malevoli
+RewriteEngine On
+
+RewriteCond %{HTTP_USER_AGENT} ^.*(AhrefsBot|SemrushBot|MJ12bot|DotBot|BLEXBot|MegaIndex|PetalBot|Bytespider|DataForSeoBot|Screaming Frog|python|curl|wget|nikto|sqlmap|masscan|nmap).*$ [NC]
+RewriteRule .* - [F,L]
+
+# Blocca richieste sospette
+RewriteCond %{QUERY_STRING} (\.\./|<script|union.*select|base64_encode|GLOBALS|_REQUEST) [NC]
+RewriteRule .* - [F,L]
+
+# Consenti solo GET e HEAD
+RewriteCond %{REQUEST_METHOD} !^(GET|HEAD)$
+RewriteRule .* - [F,L]
+
+# Protezione da hotlink immagini
+RewriteCond %{HTTP_REFERER} !^$
+RewriteCond %{HTTP_REFERER} !^https?://(www\.)?tuodominio\.it [NC]
+RewriteRule \.(jpg|jpeg|png|gif|webp)$ - [F,L]
+
+# Header di sicurezza
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# Abilita compressione
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript application/json
+</IfModule>
+
+# Cache statica
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+</IfModule>
+# Blocca accesso diretto ai file markdown
+<Files "*.md">
+Require all denied
+</Files>
