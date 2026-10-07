@@ -1,163 +1,22 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catalogo ILSA 2027</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Catalogo ILSA 2027</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
-:root{--ilsa:#861f41;--ilsa-dark:#65162f;--bg:#f3f3f3;--text:#242424;--muted:#666;--border:#dedede;--accent:#ff9800}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);font-family:Segoe UI,Arial,sans-serif;color:var(--text)}
-header{background:var(--ilsa);color:#fff;text-align:center;padding:24px 20px}
-.logo{width:320px;max-width:88%;height:auto;margin-bottom:12px}
-header h1{margin:0;font-size:clamp(28px,4vw,42px)}
-.container{max-width:1600px;margin:auto;padding:20px}
-.controls{display:grid;grid-template-columns:minmax(260px,1fr) minmax(210px,280px);gap:12px;background:#fff;padding:16px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
-.search,.sort{width:100%;padding:14px;border:1px solid #bbb;border-radius:9px;font-size:16px;background:#fff}
-.search:focus,.sort:focus{outline:3px solid rgba(134,31,65,.16);border-color:var(--ilsa)}
-.summary{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 2px;color:var(--muted);font-size:14px;flex-wrap:wrap}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
-.card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1);display:flex;flex-direction:column}
-.image{height:255px;display:flex;align-items:center;justify-content:center;padding:16px;background:#fff;border-bottom:1px solid #eee}
-.image img{max-width:100%;max-height:220px;object-fit:contain;cursor:zoom-in}
-.content{padding:18px;display:flex;flex-direction:column;flex:1}
-.codice{color:var(--ilsa);font-size:24px;font-weight:700;margin-bottom:9px}
-.descrizione{line-height:1.45;min-height:64px}
-.descrizione-en{color:var(--muted);font-size:13px;line-height:1.35;margin-top:7px;min-height:36px}
-.info{margin-top:7px;font-size:14px}
-.prezzo{color:var(--ilsa);font-size:30px;font-weight:750;margin-top:auto;padding-top:15px}
-.badge{display:inline-block;align-self:flex-start;margin-top:10px;background:var(--accent);color:#fff;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700}
-.pagination{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;margin:28px 0 10px}
-.page-btn{border:1px solid #c8c8c8;background:#fff;color:var(--text);min-width:42px;height:42px;padding:0 12px;border-radius:8px;font-size:15px;cursor:pointer}
-.page-btn:hover:not(:disabled){border-color:var(--ilsa);color:var(--ilsa)}
-.page-btn.active{background:var(--ilsa);border-color:var(--ilsa);color:#fff;font-weight:700}
-.page-btn:disabled{opacity:.42;cursor:not-allowed}
-.loading,.empty,.error{grid-column:1/-1;text-align:center;background:#fff;padding:40px 20px;border-radius:12px}
-.error{color:#a40000}
-.footer{text-align:center;color:#777;padding:24px}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:1000;align-items:center;justify-content:center;padding:25px}
-.modal.open{display:flex}.modal img{max-width:95vw;max-height:90vh;object-fit:contain;background:#fff;border-radius:8px}.modal-close{position:absolute;top:15px;right:20px;background:#fff;border:0;border-radius:50%;width:44px;height:44px;font-size:28px;cursor:pointer}
-@media(max-width:720px){.controls{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.container{padding:14px}.page-btn{min-width:39px;height:39px;padding:0 10px}.descrizione,.descrizione-en{min-height:auto}}
-</style>
-</head>
-<body>
-<header>
-<img src="LOGO80ILSA.jpg" class="logo" alt="ILSA">
-<h1>Catalogo ILSA 2027</h1>
-</header>
-<main class="container">
-<div class="controls">
-<input id="search" class="search" type="search" autocomplete="off" placeholder="Cerca per codice, nome articolo o EAN...">
-<select id="sort" class="sort" aria-label="Ordinamento articoli">
-<option value="code-asc">Codice articolo: crescente</option>
-<option value="code-desc">Codice articolo: decrescente</option>
-<option value="name-asc">Nome articolo: A-Z</option>
-<option value="name-desc">Nome articolo: Z-A</option>
-<option value="price-asc">Prezzo: dal più basso</option>
-<option value="price-desc">Prezzo: dal più alto</option>
-</select>
-</div>
-<div class="summary"><div id="stats">Caricamento catalogo...</div><div id="pageInfo"></div></div>
-<div id="lista" class="grid"><div class="loading">Caricamento articoli...</div></div>
-<nav id="pagination" class="pagination" aria-label="Paginazione catalogo"></nav>
-</main>
-<div class="footer">Catalogo prodotti ILSA</div>
-<div id="imageModal" class="modal" role="dialog" aria-modal="true" aria-label="Immagine prodotto ingrandita">
-<button id="modalClose" class="modal-close" type="button" aria-label="Chiudi">&times;</button>
-<img id="modalImage" src="" alt="">
-</div>
+:root{--i:#861f41;--id:#65162f;--bg:#f3f3f3;--mut:#666;--acc:#ff9800}*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Segoe UI,Arial,sans-serif;color:#242424}header{background:var(--i);color:#fff;text-align:center;padding:24px 20px}.logo{width:320px;max-width:88%;height:auto;margin-bottom:12px}header h1{margin:0;font-size:clamp(28px,4vw,42px)}.container{max-width:1600px;margin:auto;padding:20px}.controls{display:grid;grid-template-columns:minmax(260px,1fr) minmax(210px,280px);gap:12px;background:#fff;padding:16px;border-radius:12px;box-shadow:0 2px 10px #0001}.search,.sort{width:100%;padding:14px;border:1px solid #bbb;border-radius:9px;font-size:16px;background:#fff}.summary{display:flex;justify-content:space-between;gap:12px;margin:16px 2px;color:var(--mut);font-size:14px;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}.card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px #0002;display:flex;flex-direction:column}.image{height:255px;display:flex;align-items:center;justify-content:center;padding:16px;border-bottom:1px solid #eee}.image img{max-width:100%;max-height:220px;object-fit:contain;cursor:zoom-in}.content{padding:18px;display:flex;flex-direction:column;flex:1}.codice{color:var(--i);font-size:24px;font-weight:700;margin-bottom:9px}.desc{line-height:1.45;min-height:64px}.desc-en{color:var(--mut);font-size:13px;margin-top:7px;min-height:36px}.info{margin-top:7px;font-size:14px}.prezzo{color:var(--i);font-size:30px;font-weight:750;margin-top:auto;padding-top:15px}.badge{display:inline-block;align-self:flex-start;margin-top:10px;background:var(--acc);color:#fff;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700}.add{margin-top:14px;border:0;background:var(--i);color:#fff;border-radius:9px;padding:11px 14px;font-size:15px;font-weight:700;cursor:pointer}.add:hover{background:var(--id)}.pagination{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;margin:28px 0}.page{border:1px solid #c8c8c8;background:#fff;min-width:42px;height:42px;padding:0 12px;border-radius:8px;cursor:pointer}.page.active{background:var(--i);color:#fff}.page:disabled{opacity:.4}.loading,.empty,.error{grid-column:1/-1;text-align:center;background:#fff;padding:40px;border-radius:12px}.footer{text-align:center;color:#777;padding:24px}.cart-toggle{position:fixed;right:22px;bottom:22px;z-index:900;border:0;background:var(--i);color:#fff;border-radius:999px;padding:14px 18px;font-weight:700;box-shadow:0 5px 18px #0004;cursor:pointer}.count{display:inline-flex;align-items:center;justify-content:center;min-width:25px;height:25px;margin-left:7px;padding:0 7px;border-radius:999px;background:#fff;color:var(--i)}.cart{position:fixed;top:0;right:-520px;width:min(500px,100vw);height:100vh;background:#fff;z-index:1100;box-shadow:-5px 0 24px #0004;transition:.25s;display:flex;flex-direction:column}.cart.open{right:0}.cart-head{background:var(--i);color:#fff;padding:18px;display:flex;justify-content:space-between;align-items:center}.cart-head h2{margin:0}.close{border:0;background:#fff;color:var(--i);border-radius:50%;width:38px;height:38px;font-size:24px;cursor:pointer}.cart-body{padding:16px;overflow:auto;flex:1}.cart-empty{text-align:center;color:var(--mut);padding:36px 10px}.cart-row{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 0;border-bottom:1px solid #eee}.cart-code{font-weight:700;color:var(--i)}.cart-desc{font-size:13px;color:var(--mut);margin-top:3px}.qty{display:flex;align-items:center;gap:6px;margin-top:8px}.qty button,.remove{border:1px solid #ccc;background:#fff;border-radius:7px;cursor:pointer}.qty button{width:30px;height:30px}.remove{color:#a40000;padding:6px 9px}.line-total{text-align:right;font-weight:700}.cart-foot{padding:16px;border-top:1px solid #ddd;background:#fafafa}.total{display:flex;justify-content:space-between;font-size:20px;font-weight:750;margin-bottom:13px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.action{border:0;border-radius:8px;padding:11px 8px;font-weight:700;cursor:pointer}.excel{background:#217346;color:#fff}.csv{background:#2557a7;color:#fff}.clear{grid-column:1/-1;background:#eee}.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,90px);background:#222;color:#fff;padding:12px 18px;border-radius:8px;z-index:1400;opacity:0;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}.modal{display:none;position:fixed;inset:0;background:#000d;z-index:1200;align-items:center;justify-content:center;padding:25px}.modal.open{display:flex}.modal img{max-width:95vw;max-height:90vh;background:#fff}.modal .close{position:absolute;top:15px;right:20px}@media(max-width:720px){.controls{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.container{padding:14px}}
+</style></head><body><header><img src="LOGO80ILSA.jpg" class="logo" alt="ILSA"><h1>Catalogo ILSA 2027</h1></header>
+<main class="container"><div class="controls"><input id="search" class="search" type="search" autocomplete="off" placeholder="Cerca per codice, nome articolo o EAN..."><select id="sort" class="sort"><option value="code-asc">Codice: crescente</option><option value="code-desc">Codice: decrescente</option><option value="name-asc">Nome: A-Z</option><option value="name-desc">Nome: Z-A</option><option value="price-asc">Prezzo: dal più basso</option><option value="price-desc">Prezzo: dal più alto</option></select></div><div class="summary"><div id="stats">Caricamento...</div><div id="pageInfo"></div></div><div id="list" class="grid"><div class="loading">Caricamento articoli...</div></div><nav id="pages" class="pagination"></nav></main>
+<button id="cartToggle" class="cart-toggle">Lista <span id="cartCount" class="count">0</span></button><aside id="cart" class="cart"><div class="cart-head"><h2>Lista articoli</h2><button id="cartClose" class="close">&times;</button></div><div id="cartBody" class="cart-body"></div><div class="cart-foot"><div class="total"><span>Totale</span><span id="cartTotal">€ 0,00</span></div><div class="actions"><button id="excel" class="action excel">Esporta Excel</button><button id="csv" class="action csv">CSV Panthera</button><button id="clear" class="action clear">Svuota lista</button></div></div></aside><div id="toast" class="toast"></div><div class="footer">Catalogo prodotti ILSA</div><div id="modal" class="modal"><button id="modalClose" class="close">&times;</button><img id="modalImg" alt=""></div>
 <script>
-const SUPABASE_URL='https://ypfdfgozryeelcohdntg.supabase.co';
-const SUPABASE_KEY='sb_publishable_ROJsYJW_HNCE7HfQNf8baw_UuVfBUSg';
-const STORAGE_URL=SUPABASE_URL+'/storage/v1/object/public/prodotti/';
-const PAGE_SIZE=48;
-const FETCH_SIZE=1000;
-const client=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let allProducts=[];
-let filteredProducts=[];
-let currentPage=1;
-
-function escapeHtml(value){return String(value??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
-function normalize(value){return String(value??'').toLocaleLowerCase('it-IT').trim();}
-function priceNumber(value){if(value===null||value===undefined||value==='')return Number.POSITIVE_INFINITY;const cleaned=String(value).trim().replace(/\./g,'').replace(',','.').replace(/[^0-9.-]/g,'');const n=Number(cleaned);return Number.isFinite(n)?n:Number.POSITIVE_INFINITY;}
-function formatPrice(value){const n=priceNumber(value);if(!Number.isFinite(n))return '';return new Intl.NumberFormat('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);}
-async function loadAllProducts(){
- try{
-  let from=0;let rows=[];
-  while(true){
-   const {data,error}=await client.from('articoli').select('codice_articolo,descrizione_it,descrizione_en,ean,prezzo,nome_immagine,novita,pack_master').order('codice_articolo',{ascending:true}).range(from,from+FETCH_SIZE-1);
-   if(error)throw error;
-   rows=rows.concat(data||[]);
-   if(!data||data.length<FETCH_SIZE)break;
-   from+=FETCH_SIZE;
-  }
-  allProducts=rows;
-  applyFilters(true);
- }catch(error){console.error(error);document.getElementById('lista').innerHTML='<div class="error"><strong>Errore nel caricamento del catalogo.</strong><br>'+escapeHtml(error.message||error)+'</div>';document.getElementById('stats').textContent='';}
-}
-function applyFilters(resetPage=false){
- const term=normalize(document.getElementById('search').value);
- filteredProducts=allProducts.filter(item=>!term||normalize(item.codice_articolo).includes(term)||normalize(item.descrizione_it).includes(term)||normalize(item.descrizione_en).includes(term)||normalize(item.ean).includes(term));
- const sort=document.getElementById('sort').value;
- filteredProducts.sort((a,b)=>{
-  if(sort==='code-desc')return String(b.codice_articolo??'').localeCompare(String(a.codice_articolo??''),'it',{numeric:true});
-  if(sort==='name-asc')return String(a.descrizione_it??'').localeCompare(String(b.descrizione_it??''),'it',{sensitivity:'base'});
-  if(sort==='name-desc')return String(b.descrizione_it??'').localeCompare(String(a.descrizione_it??''),'it',{sensitivity:'base'});
-  if(sort==='price-asc')return priceNumber(a.prezzo)-priceNumber(b.prezzo);
-  if(sort==='price-desc')return priceNumber(b.prezzo)-priceNumber(a.prezzo);
-  return String(a.codice_articolo??'').localeCompare(String(b.codice_articolo??''),'it',{numeric:true});
- });
- if(resetPage)currentPage=1;
- const totalPages=Math.max(1,Math.ceil(filteredProducts.length/PAGE_SIZE));
- if(currentPage>totalPages)currentPage=totalPages;
- renderProducts();renderPagination();
-}
-function renderProducts(){
- const list=document.getElementById('lista');
- const total=filteredProducts.length;
- const totalPages=Math.max(1,Math.ceil(total/PAGE_SIZE));
- const start=(currentPage-1)*PAGE_SIZE;
- const pageItems=filteredProducts.slice(start,start+PAGE_SIZE);
- document.getElementById('stats').textContent=total+' articoli trovati su '+allProducts.length;
- document.getElementById('pageInfo').textContent=total?'Pagina '+currentPage+' di '+totalPages:'';
- if(!pageItems.length){list.innerHTML='<div class="empty">Nessun articolo trovato.</div>';return;}
- list.innerHTML=pageItems.map(item=>{
-  const code=escapeHtml(item.codice_articolo);const imageName=encodeURIComponent(String(item.nome_immagine??''));const imageUrl=STORAGE_URL+imageName;const price=formatPrice(item.prezzo);
-  return '<article class="card">'+
-   '<div class="image"><img class="product-image" src="'+imageUrl+'" alt="'+code+'" loading="lazy" data-full="'+imageUrl+'" onerror="this.onerror=null;this.src=\'https://placehold.co/400x400?text=NO+IMAGE\'"></div>'+
-   '<div class="content"><div class="codice">'+code+'</div>'+
-   '<div class="descrizione">'+escapeHtml(item.descrizione_it)+'</div>'+
-   '<div class="descrizione-en">'+escapeHtml(item.descrizione_en)+'</div>'+
-   '<div class="info"><strong>EAN:</strong> '+escapeHtml(item.ean)+'</div>'+
-   '<div class="info"><strong>Pack Master:</strong> '+escapeHtml(item.pack_master)+'</div>'+
-   (price?'<div class="prezzo">€ '+price+'</div>':'')+
-   (item.novita==='NEW'?'<div class="badge">NOVITÀ 2027</div>':'')+
-   '</div></article>';
- }).join('');
- document.querySelectorAll('.product-image').forEach(img=>img.addEventListener('click',()=>openModal(img.dataset.full,img.alt)));
-}
-function pageNumbers(totalPages){const pages=[];const radius=2;for(let p=1;p<=totalPages;p++){if(p===1||p===totalPages||Math.abs(p-currentPage)<=radius)pages.push(p);else if(pages[pages.length-1]!=='...')pages.push('...');}return pages;}
-function renderPagination(){
- const nav=document.getElementById('pagination');const totalPages=Math.max(1,Math.ceil(filteredProducts.length/PAGE_SIZE));
- if(filteredProducts.length<=PAGE_SIZE){nav.innerHTML='';return;}
- let html='<button class="page-btn" data-page="'+(currentPage-1)+'" '+(currentPage===1?'disabled':'')+'>Precedente</button>';
- pageNumbers(totalPages).forEach(p=>{html+=p==='...'?'<span>...</span>':'<button class="page-btn '+(p===currentPage?'active':'')+'" data-page="'+p+'">'+p+'</button>';});
- html+='<button class="page-btn" data-page="'+(currentPage+1)+'" '+(currentPage===totalPages?'disabled':'')+'>Successiva</button>';
- nav.innerHTML=html;
- nav.querySelectorAll('button[data-page]').forEach(btn=>btn.addEventListener('click',()=>{const target=Number(btn.dataset.page);if(target>=1&&target<=totalPages){currentPage=target;renderProducts();renderPagination();window.scrollTo({top:0,behavior:'smooth'});}}));
-}
-function openModal(src,alt){document.getElementById('modalImage').src=src;document.getElementById('modalImage').alt=alt;document.getElementById('imageModal').classList.add('open');}
-function closeModal(){document.getElementById('imageModal').classList.remove('open');document.getElementById('modalImage').src='';}
-let searchTimer;
-document.addEventListener('DOMContentLoaded',()=>{
- document.getElementById('search').addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>applyFilters(true),250);});
- document.getElementById('sort').addEventListener('change',()=>applyFilters(true));
- document.getElementById('modalClose').addEventListener('click',closeModal);
- document.getElementById('imageModal').addEventListener('click',e=>{if(e.target.id==='imageModal')closeModal();});
- document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
- loadAllProducts();
-});
-</script>
-</body>
-</html>
+const URLS='https://ypfdfgozryeelcohdntg.supabase.co',KEY='sb_publishable_ROJsYJW_HNCE7HfQNf8baw_UuVfBUSg',STORE=URLS+'/storage/v1/object/public/prodotti/',SIZE=48,FETCH=1000,db=supabase.createClient(URLS,KEY);let all=[],filtered=[],page=1,cart=JSON.parse(localStorage.getItem('ilsaCart')||'{}');
+const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])),norm=v=>String(v??'').toLocaleLowerCase('it-IT').trim();
+function pn(v){if(v==null||v==='')return Infinity;let s=String(v).trim();if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');const n=Number(s.replace(/[^0-9.-]/g,''));return Number.isFinite(n)?n:Infinity}function fp(v){const n=pn(v);return Number.isFinite(n)?new Intl.NumberFormat('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n):''}
+async function load(){try{let from=0;while(1){const {data,error}=await db.from('articoli').select('codice_articolo,descrizione_it,descrizione_en,ean,prezzo,nome_immagine,novita,pack_master').order('codice_articolo').range(from,from+FETCH-1);if(error)throw error;all=all.concat(data||[]);if(!data||data.length<FETCH)break;from+=FETCH}apply(1)}catch(e){list.innerHTML='<div class="error">Errore: '+esc(e.message)+'</div>'}}
+function apply(reset=0){const t=norm(search.value),s=sort.value;filtered=all.filter(x=>!t||[x.codice_articolo,x.descrizione_it,x.descrizione_en,x.ean].some(v=>norm(v).includes(t)));filtered.sort((a,b)=>s==='code-desc'?String(b.codice_articolo).localeCompare(String(a.codice_articolo),'it',{numeric:true}):s==='name-asc'?String(a.descrizione_it||'').localeCompare(String(b.descrizione_it||''),'it'):s==='name-desc'?String(b.descrizione_it||'').localeCompare(String(a.descrizione_it||''),'it'):s==='price-asc'?pn(a.prezzo)-pn(b.prezzo):s==='price-desc'?pn(b.prezzo)-pn(a.prezzo):String(a.codice_articolo).localeCompare(String(b.codice_articolo),'it',{numeric:true}));if(reset)page=1;render();renderPages()}
+function render(){const start=(page-1)*SIZE,items=filtered.slice(start,start+SIZE),tp=Math.max(1,Math.ceil(filtered.length/SIZE));stats.textContent=filtered.length+' articoli trovati su '+all.length;pageInfo.textContent=filtered.length?'Pagina '+page+' di '+tp:'';if(!items.length){list.innerHTML='<div class="empty">Nessun articolo trovato.</div>';return}list.innerHTML=items.map(x=>{const c=esc(x.codice_articolo),img=STORE+encodeURIComponent(x.nome_immagine||''),p=fp(x.prezzo);return '<article class="card"><div class="image"><img class="prod" src="'+img+'" data-src="'+img+'" alt="'+c+'" loading="lazy" onerror="this.src=\'https://placehold.co/400x400?text=NO+IMAGE\'"></div><div class="content"><div class="codice">'+c+'</div><div class="desc">'+esc(x.descrizione_it)+'</div><div class="desc-en">'+esc(x.descrizione_en)+'</div><div class="info"><b>EAN:</b> '+esc(x.ean)+'</div><div class="info"><b>Pack Master:</b> '+esc(x.pack_master)+'</div>'+(p?'<div class="prezzo">€ '+p+'</div>':'')+(x.novita==='NEW'?'<div class="badge">NOVITÀ 2027</div>':'')+'<button class="add" data-add="'+c+'">+ Aggiungi alla lista</button></div></article>'}).join('');document.querySelectorAll('.prod').forEach(i=>i.onclick=()=>openModal(i.dataset.src,i.alt));document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>add(b.dataset.add))}
+function renderPages(){const tp=Math.max(1,Math.ceil(filtered.length/SIZE));if(tp<=1){pages.innerHTML='';return}let nums=[];for(let p=1;p<=tp;p++){if(p===1||p===tp||Math.abs(p-page)<=2)nums.push(p);else if(nums.at(-1)!=='...')nums.push('...')}pages.innerHTML='<button class="page" data-p="'+(page-1)+'" '+(page===1?'disabled':'')+'>Precedente</button>'+nums.map(p=>p==='...'?'<span>...</span>':'<button class="page '+(p===page?'active':'')+'" data-p="'+p+'">'+p+'</button>').join('')+'<button class="page" data-p="'+(page+1)+'" '+(page===tp?'disabled':'')+'>Successiva</button>';document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{page=+b.dataset.p;render();renderPages();scrollTo({top:0,behavior:'smooth'})})}
+function save(){localStorage.setItem('ilsaCart',JSON.stringify(cart));renderCart()}function add(c){const x=all.find(y=>String(y.codice_articolo)===c);if(!x)return;cart[c]?cart[c].q++:cart[c]={code:x.codice_articolo,it:x.descrizione_it||'',en:x.descrizione_en||'',ean:x.ean||'',pack:x.pack_master||'',price:x.prezzo||'',q:1};save();toastMsg(c+' aggiunto')}
+function qty(c,d){cart[c].q=Math.max(1,cart[c].q+d);save()}function del(c){delete cart[c];save()}const ci=()=>Object.values(cart);function grand(){return ci().reduce((s,x)=>{const p=pn(x.price);return s+(Number.isFinite(p)?p*x.q:0)},0)}
+function renderCart(){const items=ci();cartCount.textContent=items.reduce((s,x)=>s+x.q,0);cartTotal.textContent='€ '+fp(grand());if(!items.length){cartBody.innerHTML='<div class="cart-empty">Lista vuota. Usa il pulsante + sugli articoli.</div>';return}cartBody.innerHTML=items.map(x=>'<div class="cart-row"><div><div class="cart-code">'+esc(x.code)+'</div><div class="cart-desc">'+esc(x.it)+'</div><div class="qty"><button data-m="'+esc(x.code)+'">-</button><b>'+x.q+'</b><button data-a="'+esc(x.code)+'">+</button><button class="remove" data-r="'+esc(x.code)+'">Rimuovi</button></div></div><div class="line-total">€ '+fp((Number.isFinite(pn(x.price))?pn(x.price):0)*x.q)+'</div></div>').join('');document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>qty(b.dataset.m,-1));document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>qty(b.dataset.a,1));document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>del(b.dataset.r))}
+function rows(){return ci().map(x=>{const p=pn(x.price);return {'Codice articolo':x.code,'Descrizione IT':x.it,'Descrizione EN':x.en,'EAN':String(x.ean),'Pack Master':x.pack,'Quantità':x.q,'Prezzo unitario':Number.isFinite(p)?p:'','Totale riga':Number.isFinite(p)?p*x.q:''}})}function xlsx(){const r=rows();if(!r.length)return toastMsg('Lista vuota');const ws=XLSX.utils.json_to_sheet(r),wb=XLSX.utils.book_new();ws['!cols']=[{wch:18},{wch:45},{wch:40},{wch:18},{wch:14},{wch:10},{wch:16},{wch:16}];XLSX.utils.book_append_sheet(wb,ws,'Lista articoli');XLSX.writeFile(wb,'Lista_articoli_ILSA.xlsx')}
+function csv(){const a=ci();if(!a.length)return toastMsg('Lista vuota');const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"',lines=['CODICE_ARTICOLO;QUANTITA;PREZZO;DESCRIZIONE;EAN',...a.map(x=>[x.code,x.q,x.price,x.it,x.ean].map(q).join(';'))],blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(blob),l=document.createElement('a');l.href=u;l.download='Lista_Panthera.csv';l.click();URL.revokeObjectURL(u)}function toastMsg(m){toast.textContent=m;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1600)}function openModal(src,alt){modalImg.src=src;modalImg.alt=alt;modal.classList.add('open')}function closeModal(){modal.classList.remove('open');modalImg.src=''}
+document.addEventListener('DOMContentLoaded',()=>{let t;search.oninput=()=>{clearTimeout(t);t=setTimeout(()=>apply(1),250)};sort.onchange=()=>apply(1);cartToggle.onclick=()=>cart.classList.add('open');cartClose.onclick=()=>cart.classList.remove('open');excel.onclick=xlsx;csv.onclick=csv;clear.onclick=()=>{if(confirm('Svuotare la lista?')){cart={};save()}};modalClose.onclick=closeModal;modal.onclick=e=>{if(e.target===modal)closeModal()};document.onkeydown=e=>{if(e.key==='Escape')closeModal()};renderCart();load()});
+</script></body></html>
