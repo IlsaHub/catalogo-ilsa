@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Catalogo ILSA</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+:root{
+    --ilsa:#861f41;
+    --light:#f5f5f5;
+    --border:#e4e4e4;
+}
+
+body{
+    margin:0;
+    font-family:Segoe UI,Arial,sans-serif;
+    background:var(--light);
+}
+
+header{
+    background:var(--ilsa);
+    color:white;
+    text-align:center;
+    padding:20px;
+}
+
+.logo{
+    max-width:260px;
+    margin-bottom:15px;
+}
+
+.container{
+    max-width:1400px;
+    margin:auto;
+    padding:20px;
+}
+
+.search-box{
+    width:100%;
+    padding:14px;
+    font-size:16px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    box-sizing:border-box;
+    margin-bottom:20px;
+}
+
+.stats{
+    margin-bottom:15px;
+    color:#666;
+    font-size:14px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(350px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:white;
+    border-radius:10px;
+    padding:15px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.img-container{
+    text-align:center;
+    margin-bottom:15px;
+}
+
+.img-container img{
+    max-width:220px;
+    max-height:220px;
+    object-fit:contain;
+}
+
+.codice{
+    color:var(--ilsa);
+    font-weight:bold;
+    font-size:20px;
+    margin-bottom:10px;
+}
+
+.descrizione{
+    min-height:80px;
+    font-size:14px;
+}
+
+.prezzo{
+    margin-top:10px;
+    font-size:22px;
+    font-weight:bold;
+    color:var(--ilsa);
+}
+
+.badge{
+    display:inline-block;
+    background:#ff9800;
+    color:white;
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:12px;
+    margin-top:8px;
+}
+
+.loader{
+    text-align:center;
+    padding:40px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+ 
+<img
+src="LOGO80ILSA.jpg"
+class="logo"
+alt="ILSA">
+ 
+<h1>Catalogo ILSA 2027</h1>
+ 
+</header>
+
+<div class="container">
+
+<input
+id="search"
+class="search-box"
+type="text"
+placeholder="Cerca codice articolo o descrizione...">
+
+<div id="stats" class="stats"></div>
+
+<div id="lista" class="grid"></div>
+
+</div>
+
+<script>
+
+const supabaseUrl =
+'https://ypfdfgozryeelcohdntg.supabase.co';
+
+const supabaseKey =
+'sb_publishable_ROJsYJW_HNCE7HfQNf8baw_UuVfBUSg';
+
+const client =
+supabase.createClient(
+supabaseUrl,
+supabaseKey
+);
+
+async function caricaArticoli() {
+
+    const ricerca =
+    document
+    .getElementById("search")
+    .value
+    .trim();
+
+    let query =
+client
+.from("articoli")
+.select("*")
+.order("codice_articolo");
+ 
+if(!ricerca){
+query = query.limit(100);
+}
+
+    if(ricerca){
+
+        query =
+        query.or(
+`codice_articolo.ilike.%${ricerca}%,descrizione_it.ilike.%${ricerca}%,descrizione_en.ilike.%${ricerca}%`
+        );
+
+    }
+
+    const {data,error} =
+    await query;
+
+    if(error){
+
+        document.getElementById("lista").innerHTML =
+        "<pre>"+JSON.stringify(error,null,2)+"</pre>";
+
+        return;
+    }
+
+    document.getElementById("stats").innerHTML =
+    `${data.length} articoli visualizzati`;
+
+    let html = "";
+
+    data.forEach(item => {
+
+        const foto =
+`https://ypfdfgozryeelcohdntg.supabase.co/storage/v1/object/public/prodotti/${item.nome_immagine}`;
+
+        html += `
+
+        <div class="card">
+
+            <div class="img-container">
+
+                <img
+                src="${foto}"
+                alt="${item.codice_articolo}"
+                onerror="this.src='https://placehold.co/220x220?text=No+Image'">
+
+            </div>
+
+            <div class="codice">
+                ${item.codice_articolo}
+            </div>
+
+            <div class="descrizione">
+                ${item.descrizione_it || ''}
+            </div>
+
+            <div>
+                EAN: ${item.ean || ''}
+            </div>
+
+            <div>
+                Pack Master: ${item.pack_master || ''}
+            </div>
+
+            <div class="prezzo">
+                € ${item.prezzo || ''}
+            </div>
+
+            ${
+                item.novita === "NEW"
+                ? '<div class="badge">NOVITÀ 2027</div>'
+                : ''
+            }
+
+        </div>
+
+        `;
+    });
+
+    document.getElementById("lista").innerHTML =
+    html;
+}
+
+document.addEventListener(
+"DOMContentLoaded",
+function(){
+
+    caricaArticoli();
+
+    document
+    .getElementById("search")
+    .addEventListener(
+        "keyup",
+        caricaArticoli
+    );
+
+});
+
+</script>
+
+</body>
+</html>
